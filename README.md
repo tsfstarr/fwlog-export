@@ -3,7 +3,7 @@ Syntax: log_export.sh [-v | --verbose]
 
 - Setup: SERVER, USER and KEYFILE variables need populating
 - Designed to run as background job
-- Tests connection to remote server and lists directory to prevent duplicate creation
+- Tests connection to remote server and lists directory to prevent creation of duplicates
 - Use verbose flag and script log file for debugging
 - $FWDIR/log path, *.log* file names
 - Read file ages from filename timestamps
@@ -13,7 +13,7 @@ Syntax: log_export.sh [-v | --verbose]
 - Each local archive is deleted after transfer to allow for low disk space
 - No plain-text password used. Relies on authorised-key authentication
 - No FW-1 log deletion is performed by this script
-- Further work: getopts handling, and accepting opts for one-time use
+- Further work: getopts handling, and accepting opts for one-time use, and disk space check
 
 # -- Procedure --
 ```
