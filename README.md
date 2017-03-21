@@ -5,7 +5,7 @@ Syntax: log_export.sh [-v | --verbose]
 - Designed to run as background job
 - Tests connection to remote server and lists directory to prevent creation of duplicates
 - Use verbose flag and script log file for debugging
-- $FWDIR/log path, *.log* file names
+- $FWDIR/log path, `*.log`* file names
 - Read file ages from filename timestamps
 - Filenames must be timestamped YYYY-MM-DD, and be within this century
 - Consider files whose timestamp month value are older than one month ago
