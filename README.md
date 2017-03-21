@@ -16,7 +16,7 @@ Syntax: log_export.sh [-v | --verbose]
 - Further work: getopts handling, and accepting opts for one-time use
 
 # -- Procedure --
-Variables
+`Variables
 Grab "*.log*" directory list to array
 Declare functions, set vars by input flag
 
@@ -38,4 +38,4 @@ loop month archives for compression
   If compressed, scp archive with key authentication and no password
   delete archive file
 end loop
-Delete temporary directory
+Delete temporary directory`
