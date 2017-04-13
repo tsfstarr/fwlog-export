@@ -1,7 +1,7 @@
 # -- Log Export Script for Check Point logging modules --
 Syntax: log_export.sh [-v | --verbose]
 
-- Setup: SERVER, USER and KEYFILE variables need populating
+- Setup: SERVER, USER, RDIR and KEYFILE variables need populating
 - Designed to run as background job
 - Tests connection to remote server and lists directory to prevent creation of duplicates
 - Use verbose flag and script log file for debugging
