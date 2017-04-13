@@ -55,9 +55,9 @@ compress () {                           # Compress month of filenames
   fi
 }
 
-transfer () {                           # Transfer file by SCP
+transfer () {                           # Transfer file by SFTP
   is_verbose "Transferring $1..."
-  scp -Bpi $KEYFILE -o PasswordAuthentication="no" "$DIR/$1.tgz" $USER@$SERVER:/$USER > /dev/null 2>&1
+  printf '%s\n' "lcd $DIR" "put $1.tgz" | sftp -b - -o IdentityFile="$KEYFILE" -o PasswordAuthentication=no $USER@$SERVER > /dev/null 2>&1
   if [ "$?" -eq "0" ]; then
     is_verbose "$(echo "Successfully transferred $1." | tee -a $EXPORTLOG)"
 	return 0
@@ -110,7 +110,10 @@ do
   fi
 done
                                         # Test connection to server and retrieve listing
-REMOTELIST=$(ssh -i $KEYFILE -o PasswordAuthentication="no" $USER@$SERVER ls 2> /dev/null)
+REMOTELIST=$(sftp -o PasswordAuthentication=no -o IdentityFile=$KEYFILE $USER@$SERVER <<EOF 2>&1
+dir
+EOF
+)
 if [ "$?" -gt "0" ]; then               # Exit if remote listing could not be retrieved
   is_verbose "$(echo "Remote server access failed. Exiting..." | tee -a $EXPORTLOG)"
   exit 1
