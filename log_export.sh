@@ -3,13 +3,15 @@ source /etc/profile.d/CP.sh             # Check Point env vars
 EXPORTLOG='/var/log/log_export.log'
 SERVER=''
 USER=''
+KEYFILE=
+RDIR=''
 DIR='/var/tmp/log_export'
 FILES=$FWDIR/log/*.log*
-KEYFILE=
 COMPDIRS=()
 MONTH=$(date +%m)
 YEAR=$(date +%Y)
 VERBOSE=1
+RDIRFAIL=0
 
 #----------- SETUP
 
@@ -57,7 +59,11 @@ compress () {                           # Compress month of filenames
 
 transfer () {                           # Transfer file by SFTP
   is_verbose "Transferring $1..."
-  printf '%s\n' "lcd $DIR" "put $1.tgz" | sftp -b - -o IdentityFile="$KEYFILE" -o PasswordAuthentication=no $USER@$SERVER > /dev/null 2>&1
+  if [ "$RDIRFAIL" -gt "0" ]; then      # If RDIR was not accessible in the listing phase, do not try to change directory
+    printf '%s\n' "lcd $DIR" "put $1.tgz" | sftp -b - -o IdentityFile="$KEYFILE" -o PasswordAuthentication=no $USER@$SERVER > /dev/null 2>&1
+  else
+    printf '%s\n' "lcd $DIR" "cd $RDIR" "put $1.tgz" | sftp -b - -o IdentityFile="$KEYFILE" -o PasswordAuthentication=no $USER@$SERVER > /dev/null 2>&1
+  fi
   if [ "$?" -eq "0" ]; then
     is_verbose "$(echo "Successfully transferred $1." | tee -a $EXPORTLOG)"
 	return 0
@@ -109,11 +115,13 @@ do
     is_verbose "Too recent or invalid time. Skipping... [$F]   Log timestamp: ${LOGTIME[0]} ${LOGTIME[1]:3:2}"
   fi
 done
-                                        # Test connection to server and retrieve listing
-REMOTELIST=$(sftp -o PasswordAuthentication=no -o IdentityFile=$KEYFILE $USER@$SERVER <<EOF 2>&1
-dir
-EOF
-)
+                                        # Test that remote directory exists
+REMOTELIST=$(printf '%s\n' "cd $RDIR" "dir" | sftp -b - -o IdentityFile="$KEYFILE" -o PasswordAuthentication=no $USER@$SERVER)
+if [ "$?" -gt "0" ]; then               # If remote directory cannot be accessed, do not try to change directory
+  REMOTELIST=$(printf '%s\n' "dir" | sftp -b - -o IdentityFile="$KEYFILE" -o PasswordAuthentication=no $USER@$SERVER)
+  RDIRFAIL=1
+fi
+
 if [ "$?" -gt "0" ]; then               # Exit if remote listing could not be retrieved
   is_verbose "$(echo "Remote server access failed. Exiting..." | tee -a $EXPORTLOG)"
   exit 1
