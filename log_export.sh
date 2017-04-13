@@ -3,9 +3,10 @@ source /etc/profile.d/CP.sh             # Check Point env vars
 EXPORTLOG='/var/log/log_export.log'
 SERVER=''
 USER=''
+KEYFILE=
+RDIR=''
 DIR='/var/tmp/log_export'
 FILES=$FWDIR/log/*.log*
-KEYFILE=
 COMPDIRS=()
 MONTH=$(date +%m)
 YEAR=$(date +%Y)
@@ -57,7 +58,7 @@ compress () {                           # Compress month of filenames
 
 transfer () {                           # Transfer file by SCP
   is_verbose "Transferring $1..."
-  scp -Bpi $KEYFILE -o PasswordAuthentication="no" "$DIR/$1.tgz" $USER@$SERVER:/$USER > /dev/null 2>&1
+  scp -Bpi $KEYFILE -o PasswordAuthentication="no" "$DIR/$1.tgz" $USER@$SERVER:$RDIR > /dev/null 2>&1
   if [ "$?" -eq "0" ]; then
     is_verbose "$(echo "Successfully transferred $1." | tee -a $EXPORTLOG)"
 	return 0
@@ -109,8 +110,13 @@ do
     is_verbose "Too recent or invalid time. Skipping... [$F]   Log timestamp: ${LOGTIME[0]} ${LOGTIME[1]:3:2}"
   fi
 done
+                                        # Test that remote directory exists
+ssh -i $KEYFILE -o PasswordAuthentication="no" $USER@$SERVER "cd $RDIR" > /dev/null 2>&1
+if [ "$?" -gt "0" ]; then               # If remote directory cannot be accessed, set RDIR to user home
+  RDIR=""
+fi
                                         # Test connection to server and retrieve listing
-REMOTELIST=$(ssh -i $KEYFILE -o PasswordAuthentication="no" $USER@$SERVER ls 2> /dev/null)
+REMOTELIST=$(ssh -i $KEYFILE -o PasswordAuthentication="no" $USER@$SERVER "cd $RDIR; ls" 2> /dev/null)
 if [ "$?" -gt "0" ]; then               # Exit if remote listing could not be retrieved
   is_verbose "$(echo "Remote server access failed. Exiting..." | tee -a $EXPORTLOG)"
   exit 1
