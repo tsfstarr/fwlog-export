@@ -36,7 +36,7 @@ Exit if there are no new archives to process
 Create temporary directory
 loop month archives for compression
   Compress all files of the same month to tarball
-  If compressed, scp archive with key authentication and no password
+  If compressed, transfer archive with key authentication and no password
   delete archive file
 end loop
 Delete temporary directory
