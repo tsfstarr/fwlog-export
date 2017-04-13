@@ -10,6 +10,7 @@ Syntax: log_export.sh [-v | --verbose]
 - Filenames must be timestamped YYYY-MM-DD, and be within this century
 - Consider files whose timestamp month value are older than one month ago
 - Compress eligible files to archive file for that month, COMP-YYYYMM
+- If remote directory specified does not exist, uses default login directory
 - Each local archive is deleted after transfer to allow for low disk space
 - No plain-text password used. Relies on authorised-key authentication
 - No FW-1 log deletion is performed by this script
