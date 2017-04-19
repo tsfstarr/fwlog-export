@@ -118,8 +118,8 @@ done
                                         # Test that remote directory exists
 REMOTELIST=$(printf '%s\n' "cd $RDIR" "dir" | sftp -b - -o IdentityFile="$KEYFILE" -o PasswordAuthentication=no $USER@$SERVER)
 if [ "$?" -gt "0" ]; then               # If remote directory cannot be accessed, do not try to change directory
-  REMOTELIST=$(printf '%s\n' "dir" | sftp -b - -o IdentityFile="$KEYFILE" -o PasswordAuthentication=no $USER@$SERVER)
   RDIRFAIL=1
+  REMOTELIST=$(printf '%s\n' "dir" | sftp -b - -o IdentityFile="$KEYFILE" -o PasswordAuthentication=no $USER@$SERVER)
 fi
 
 if [ "$?" -gt "0" ]; then               # Exit if remote listing could not be retrieved
